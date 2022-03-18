@@ -1,8 +1,10 @@
-# $patients = [
-#     { species:"dog", age: "2", name:"Jack", owner:"John Smith", phone: "999-999-9999"},
-#     { species:"bird", age: "3", name:"Mia", owner:"Jane Doe", phone: "888-888-8888"},
-#     { species:"cat", age: "4", name:"Grace", owner:"Louis", phone: "777-777-7777"},
-# ]
+require 'io/console'
+
+$patients = [
+    { species:"dog", age: "2", name:"Jack", owner:"John Smith", phone: "999-999-9999"},
+    { species:"bird", age: "3", name:"Mia", owner:"Jane Doe", phone: "888-888-8888"},
+    { species:"cat", age: "4", name:"Grace", owner:"Louis", phone: "777-777-7777"},
+]
 
 $clinics = [
     { clinic_name: "Flatiron Veterinary Clinic", address: "111 Hacker Way", phone: "777-777-7777"},
@@ -11,6 +13,7 @@ $clinics = [
 ]
 
 def initialize_app
+    seed
     menu
 end
 
@@ -22,6 +25,8 @@ def menu
     puts "3. List Patient Species"
     puts "4. List Clinic Names"
     puts "5. Add New Patient"
+    puts "6. Find a Patient"
+    puts "7. Delete a Patient"
     puts "0. Exit" + "\n\n"
 
     # initial user input prompt
@@ -30,24 +35,30 @@ def menu
 
     case user_input
     
+    when "7"
+        puts "Enter a patient ID"
+        id = gets.strip.to_i
+        patient = Patient.all.filter { |p| p.id == id }
+        patient[0].delete_patient
+
+    when "6"
+        puts "Enter a patient name:"
+        name = gets.strip
+        puts "Enter a patient owner:"
+        owner = gets.strip
+
+        puts Patient.find_patient(name, owner)
     when "5"
         create_patient
-        menu
     when "4"
         # .map returns an Array
         clinics_array = $clinics.map{|clinic| clinic[:clinic_name]}
         puts clinics_array
-        
-        # recursive method call
-        menu
     when "3"
         # .map returns an Array
-        patients_array = Patient.all.map{|patient| patient[:species]}
-        puts patients_array
-        menu
+        puts Patient.all_species
     when "2"
         $clinics.each { |clinic| puts clinic }
-        menu
     when "1"
         if Patient.all.length != 0
             puts "\n"
@@ -64,10 +75,24 @@ def menu
         else
             puts "\n" + "No Patients!"
         end
-        menu      
     when "0"
         puts "Goodbye!"
+        exit
+    else
+        try_again
     end
+    return_to_menu
+end
+
+def try_again
+    puts "Sorry, that option doesn't exist. Please try again."
+    menu
+end
+
+def return_to_menu
+    print "Press any key to return."
+    STDIN.getch
+    menu
 end
     
 def create_patient
@@ -83,22 +108,22 @@ def create_patient
     new_phone = gets.strip
 
     # create hash literal for each new_patient
-    # new_patient = {
-    #     id: $patients.length + 1,
-    #     species: new_species,
-    #     name: new_name,
-    #     owner: new_owner,
-    #     phone: new_phone
-    # }
+    new_patient = {
+        species: new_species,
+        age: new_age,
+        name: new_name,
+        owner: new_owner,
+        phone: new_phone
+    }
 
     # species, age, name, owner, phone
-    p1 = Patient.new(
-        new_species, 
-        new_age, 
-        new_name,
-        new_owner,
-        new_phone
-    );
+    p1 = Patient.new(new_patient);
 end
 
 # New Patient Logic (End)
+
+def seed
+    $patients.each do |patient|
+        Patient.new(patient)
+    end
+end

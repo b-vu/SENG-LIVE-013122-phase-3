@@ -10,47 +10,65 @@ $clinics = [
     { id: 3, clinic_name: "Pets R Us", address: "333 Animal Way", phone: "555-555-5555"}
 ]
 
+$patients.each do |patient|
+    Patient.new(
+        patient[:id],
+        patient[:species],
+        patient[:age],
+        patient[:name],
+        patient[:owner],
+        patient[:phone]
+    )
+end
+
 def initialize_app
+    menu
+end
 
-    # char_space = "\n"
+def menu
+    puts "\n" + "Welcome to Flatiron Veterinary Clinic!" + "\n\n"
+    puts "Please choose an option:" ++ "\n\n"
+    puts "1. List All Patients"
+    puts "2. List All Clinics"
+    puts "3. List Patient Species"
+    puts "4. List Clinic Names"
+    puts "5. Add New Patient"
+    puts "0. Exit" + "\n\n"
 
-    # Menu Logic (Beginning)
+    # initial user input prompt
+    print "Enter Your Prompt: "
+    user_input = gets.strip
 
-        puts "\n" + "Welcome to Flatiron Veterinary Clinic!" + "\n\n"
-        puts "Please choose an option:" ++ "\n\n"
-        puts "1. List All Patients"
-        puts "2. List All Clinics"
-        puts "3. List Patient Species"
-        puts "4. List Clinic Names"
-        puts "5. Add New Patient"
-        puts "0. Exit" + "\n\n"
-
-        # initial user input prompt
-        print "Enter Your Prompt: "
-        user_input = gets.strip
-
-        # Case Statement => Better for Numerous Options / Easily Scalable
-        case user_input
-        
-        when "5"
-            create_patient
-        when "4"
-            # .map returns an Array
-            clinics_array = $clinics.map{|clinic| clinic[:clinic_name]}
-            puts clinics_array
-        when "3"
-            # .map returns an Array
-            patients_array = $patients.map{|patient| patient[:species]}
-            puts patients_array
-        when "2"
-            $clinics.each { |clinic| puts clinic }
-        when "1"
-            $patients.each { |patient| puts patient }
-        when "0"
-            puts "Goodbye!"
+    # Case Statement => Better for Numerous Options / Easily Scalable
+    case user_input
+    
+    when "5"
+        create_patient
+        menu
+    when "4"
+        # .map returns an Array
+        clinics_array = $clinics.map{|clinic| clinic[:clinic_name]}
+        puts clinics_array
+        menu
+    when "3"
+        # .map returns an Array
+        patients_array = $patients.map{|patient| patient[:species]}
+        puts patients_array
+        menu
+    when "2"
+        $clinics.each { |clinic| puts clinic }
+        menu
+    when "1"
+        if Patient.all.length > 0
+            Patient.all.each { |patient| puts "#{patient.name}" }
+            menu
+        else
+            puts "There are currently no patients"
+            menu
         end
-        
-    # Menu Logic (End)
+    when "0"
+        puts "Goodbye!"
+    end
 end
 
 def create_patient
@@ -66,18 +84,28 @@ def create_patient
     new_phone = gets.strip
 
     # create hash literal for each new_patient
-    new_patient = {
-        id: $patients.length + 1,
-        species: new_species,
-        age: new_age,
-        name: new_name,
-        owner: new_owner,
-        phone: new_phone
-    }
+    # new_patient = {
+    #     id: $patients.length + 1,
+    #     species: new_species,
+    #     age: new_age,
+    #     name: new_name,
+    #     owner: new_owner,
+    #     phone: new_phone
+    # }
 
     # add ("shovel") new_patient to $patients 
-    $patients << new_patient
+    # $patients << new_patient
     
     # output updated list of $patients
-    puts $patients
+    # puts $patients
+
+    p1 = Patient.new(
+        Patient.all.length + 1, 
+        new_species, 
+        new_age, 
+        new_name, 
+        new_owner, 
+        new_phone
+    )
+    binding.pry
 end

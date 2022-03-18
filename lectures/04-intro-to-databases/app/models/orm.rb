@@ -26,8 +26,15 @@ class PatientORM
         # ACTIVITY 1 => Use mass assignment to allow attributes to be 
         # passed into initialize() as key / value pairs
 
+        attributes.each do |key, value|
+            if self.respond_to?("#{key.to_s}=")
+                self.class.attr_accessor(key)
+                self.send("#{key}=", value)
+            end
+        end
+
         # Example Case:
-        # patientORM.new(
+        # PatientORM.new(
         #     name: "Grace", 
         #     age: 1, 
         #     owner: "Sally",
@@ -47,29 +54,46 @@ class PatientORM
         sql = <<-SQL
         INSERT INTO patients (species, name, age, owner, number) VALUES (?,?,?,?,?);        
         SQL
-        
+
         # ACTIVITY 1 => Use "execute" and "last_insert_row_id" to add new
         # PatientORM class instances to DB with appropriate IDs
         # https://www.rubydoc.info/github/luislavena/sqlite3-ruby/SQLite3/Database#execute-instance_method
         # https://www.rubydoc.info/github/luislavena/sqlite3-ruby/SQLite3%2FDatabase:last_insert_row_id
 
+        DB.execute(sql, self.species, self.name, self.age, self.owner, self.number)
+        @id = DB.last_insert_row_id # Don't use self.id here!
+
         # NOTE => Remember to return "self" instance
+        # self
     end
 
     def self.create(args)
         # ACTIVITY 2 => Use "new" and "save" to simultaneously 
         # create / add new PatientORM class instances to DB
-        
+        new_patient = PatientORM.new(args)
+        new_patient.save
+
         # NOTE => Remember to return "patient" instance
+        new_patient
     end
 
     def self.all 
         # ACTIVITY 2 => Use "DB.execute()" + SQL to retrieve all 
         # patients from table.
-        
-        # HINT => Use ".map" and "self.new" to create an array of "mapped_resources"
+        sql = "SELECT * FROM patients"
+        patients = DB.execute(sql)
 
+        # HINT => Use ".map" and "self.new" to create an array of "mapped_resources"
         # NOTE => Remember to return "mapped_resources" as an iterable list
         # of patients
+        # You don't want them stored as hash objects but as INSTANCES of the PatientORM class stored in memory that we can use and manipulate on our end in Ruby
+        mapped_resources = patients.map do |patient|
+            PatientORM.new(patient)
+        end
+        mapped_resources
     end
 end 
+
+# {
+#     name: "Mickey", age: 4, owner: "Walt", number: 1231231234, species: "Mouse"
+# }
