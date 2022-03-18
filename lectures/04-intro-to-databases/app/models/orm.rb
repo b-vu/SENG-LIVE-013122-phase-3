@@ -24,8 +24,7 @@ class PatientORM
     # Will this create a new record in DB or not?
     def initialize(attributes) 
         # ACTIVITY 1 => Use mass assignment to allow attributes to be 
-        # passed into initialize() as key / value pairs
-
+        # passed into initialize() as group of key / value pairs
         attributes.each do |key, value|
             if self.respond_to?("#{key.to_s}=")
                 self.class.attr_accessor(key)
@@ -41,6 +40,9 @@ class PatientORM
         #     number: 2,
         #     species: "Cat"    
         # )
+
+        # Use Rake Console Test Case:
+        # PatientORM.new(name: "Grace", age: 1, owner: "Sally", number: 2, species: "Cat")
 
         # method hints => ".each", ".respond_to?", ".send"
         # https://apidock.com/ruby/Object/respond_to%3F
